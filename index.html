@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>VPN Browser</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: Arial, sans-serif;
+    background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
+    min-height: 100vh;
+    color: white;
+  }
+  .header {
+    background: rgba(255,255,255,0.1);
+    padding: 15px 20px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    backdrop-filter: blur(10px);
+  }
+  .logo {
+    font-size: 1.5em;
+    font-weight: bold;
+    color: #00ff88;
+  }
+  .url-bar {
+    flex: 1;
+    display: flex;
+    gap: 10px;
+  }
+  .url-input {
+    flex: 1;
+    padding: 10px 15px;
+    border-radius: 25px;
+    border: 2px solid #00ff88;
+    background: rgba(255,255,255,0.1);
+    color: white;
+    font-size: 14px;
+    outline: none;
+  }
+  .url-input::placeholder { color: rgba(255,255,255,0.5); }
+  .go-btn {
+    padding: 10px 25px;
+    background: #00ff88;
+    color: #000;
+    border: none;
+    border-radius: 25px;
+    font-weight: bold;
+    cursor: pointer;
+    font-size: 14px;
+  }
+  .go-btn:hover { background: #00cc6a; }
+  .status-bar {
+    background: rgba(0,255,136,0.1);
+    padding: 8px 20px;
+    display: flex;
+    gap: 20px;
+    font-size: 12px;
+    border-bottom: 1px solid rgba(0,255,136,0.2);
+  }
+  .status-item { display: flex; align-items: center; gap: 5px; }
+  .dot { width: 8px; height: 8px; border-radius: 50%; background: #00ff88; }
+  .browser-frame {
+    width: 100%;
+    height: calc(100vh - 110px);
+    border: none;
+    background: white;
+  }
+  .home-screen {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: calc(100vh - 110px);
+    gap: 20px;
+  }
+  .home-title {
+    font-size: 2em;
+    color: #00ff88;
+    text-align: center;
+  }
+  .home-subtitle {
+    color: rgba(255,255,255,0.7);
+    text-align: center;
+  }
+  .quick-links {
+    display: flex;
+    gap: 15px;
+    flex-wrap: wrap;
+    justify-content: center;
+    margin-top: 20px;
+  }
+  .quick-btn {
+    padding: 10px 20px;
+    background: rgba(255,255,255,0.1);
+    border: 1px solid rgba(0,255,136,0.3);
+    border-radius: 10px;
+    color: white;
+    cursor: pointer;
+    font-size: 14px;
+  }
+  .quick-btn:hover { background: rgba(0,255,136,0.2); }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="logo">🛡️ VPN Browser</div>
+  <div class="url-bar">
+    <input 
+      class="url-input" 
+      id="urlInput" 
+      type="text" 
+      placeholder="যেকোনো URL লিখুন... যেমন: google.com"
+      onkeypress="handleKey(event)"
+    />
+    <button class="go-btn" onclick="loadSite()">যাও</button>
+  </div>
+</div>
+
+<div class="status-bar">
+  <div class="status-item"><div class="dot"></div> VPN সক্রিয়</div>
+  <div class="status-item"><div class="dot"></div> এনক্রিপ্টেড</div>
+  <div class="status-item" id="ipDisplay"><div class="dot"></div> সুরক্ষিত</div>
+</div>
+
+<div id="homeScreen" class="home-screen">
+  <div class="home-title">🛡️ VPN Browser</div>
+  <div class="home-subtitle">নিরাপদে ইন্টারনেট ব্রাউজ করুন</div>
+  <div class="quick-links">
+    <button class="quick-btn" onclick="loadURL('https://www.google.com')">🔍 Google</button>
+    <button class="quick-btn" onclick="loadURL('https://www.youtube.com')">▶️ YouTube</button>
+    <button class="quick-btn" onclick="loadURL('https://www.wikipedia.org')">📖 Wikipedia</button>
+    <button class="quick-btn" onclick="loadURL('https://www.facebook.com')">👥 Facebook</button>
+  </div>
+</div>
+
+<iframe 
+  id="browserFrame" 
+  class="browser-frame" 
+  style="display:none"
+  sandbox="allow-same-origin allow-scripts allow-forms allow-popups"
+></iframe>
+
+<script>
+  function handleKey(e) {
+    if (e.key === 'Enter') loadSite();
+  }
+
+  function loadSite() {
+    const input = document.getElementById('urlInput').value.trim();
+    if (!input) return;
+    let url = input;
+    if (!url.startsWith('http')) url = 'https://' + url;
+    loadURL(url);
+  }
+
+  function loadURL(url) {
+    document.getElementById('urlInput').value = url;
+    document.getElementById('homeScreen').style.display = 'none';
+    
+    // প্রক্সি দিয়ে লোড করুন
+    const proxyUrl = 'https://api.allorigins.win/raw?url=' + encodeURIComponent(url);
+    
+    const frame = document.getElementById('browserFrame');
+    frame.style.display = 'block';
+    frame.src = proxyUrl;
+    
+    document.getElementById('ipDisplay').innerHTML = 
+      '<div class="dot"></div> Proxy: allorigins.win';
+  }
+</script>
+
+</body>
+</html
